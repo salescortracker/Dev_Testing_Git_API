@@ -37,6 +37,10 @@ public partial class Company
 
     public string? CompanyEmail { get; set; }
 
+    public string? CompanyContact { get; set; }
+
+    public string? CompanyAddress { get; set; }
+
     public virtual ICollection<AssetStatus> AssetStatuses { get; set; } = new List<AssetStatus>();
 
     public virtual ICollection<AttachmentType> AttachmentTypes { get; set; } = new List<AttachmentType>();
