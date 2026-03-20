@@ -9,6 +9,7 @@ namespace HRMS_Backend.Controllers
     [ApiController]
     public class MasterDataController : ControllerBase
     {
+        private readonly IGradeService _gradeService;
         private readonly IBloodGroupService _bloodGroupService;
         private readonly IDepartmentService _service;
         private readonly IGenderService _genderService;
@@ -37,7 +38,7 @@ namespace HRMS_Backend.Controllers
         private readonly IInterviewLevelService _interviewLevelService;
         private readonly ICompanyNewsCategoryService _companyNewsCategoryService;
         private readonly IEmploymentTypeService _employmentTypeService;
-        public MasterDataController(IEmploymentTypeService employmentTypeService,ICompanyNewsCategoryService companyNewsCategoryService,IRecruitmentNoticePeriodService recruitmentNoticePeriodService, IScreeningResultService screeningResultService, IInterviewLevelService interviewLevelService,ICompanyNewsPolicyService companyNewsPolicyService,IModeOfStudyService modeOfStudyService,IEventService Eventservice,IResignationService resignationService,IPolicyCategoryService policyCategoryService,ILeaveStatusService leaveStatusService,IHolidayListService holidayListService, IWeekoffService weekoffService,IAttendanceStatusService attendanceStatusService, IExpenseCategoryService expenseCategoryservice,IDepartmentService service, IDesignationService designationService, IGenderService genderService,IadminService adminService, ILeaveTypeService leaveTypeService,  ILogger<MasterDataController> logger, IKpiCategoryService kpiCategoryService, IEmployeeMasterService employeeService, ICertificationTypeService certificationTypeService, IAssetStatusService assetStatusService, IBloodGroupService bloodGroupService, IHelpdeskCategoryAdminService helpdeskCategoryAdminService, IProjectStatusAdminService projectStatusAdminService, IPriorityService priorityService)
+        public MasterDataController(IGradeService GradeService, IEmploymentTypeService employmentTypeService,ICompanyNewsCategoryService companyNewsCategoryService,IRecruitmentNoticePeriodService recruitmentNoticePeriodService, IScreeningResultService screeningResultService, IInterviewLevelService interviewLevelService,ICompanyNewsPolicyService companyNewsPolicyService,IModeOfStudyService modeOfStudyService,IEventService Eventservice,IResignationService resignationService,IPolicyCategoryService policyCategoryService,ILeaveStatusService leaveStatusService,IHolidayListService holidayListService, IWeekoffService weekoffService,IAttendanceStatusService attendanceStatusService, IExpenseCategoryService expenseCategoryservice,IDepartmentService service, IDesignationService designationService, IGenderService genderService,IadminService adminService, ILeaveTypeService leaveTypeService,  ILogger<MasterDataController> logger, IKpiCategoryService kpiCategoryService, IEmployeeMasterService employeeService, ICertificationTypeService certificationTypeService, IAssetStatusService assetStatusService, IBloodGroupService bloodGroupService, IHelpdeskCategoryAdminService helpdeskCategoryAdminService, IProjectStatusAdminService projectStatusAdminService, IPriorityService priorityService)
         {
             _service = service;
             _Eventservice = Eventservice;
@@ -68,7 +69,54 @@ namespace HRMS_Backend.Controllers
             _interviewLevelService = interviewLevelService;
             _companyNewsCategoryService = companyNewsCategoryService;
             _employmentTypeService = employmentTypeService;
+            _gradeService = GradeService;
         }
+
+        #region Grade
+
+        [HttpGet("GetGradeAll")]
+        public async Task<IActionResult> GetGradeAll(int companyId)
+        {
+            var result = await _gradeService.GetAllAsync(companyId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetGradeById/{id}")]
+        public async Task<IActionResult> GetGradeById(int id)
+        {
+            var data = await _gradeService.GetByIdAsync(id);
+            if (data == null) return NotFound();
+            return Ok(data);
+        }
+
+        [HttpPost("CreateGrade")]
+        public async Task<IActionResult> CreateGrade([FromBody] GradeDto dto)
+        {
+            var result = await _gradeService.AddAsync(dto);
+            if (result == null)
+                return Ok(new { message = "Duplicate Record Found" });
+
+            return Ok(new { message = "Grade created", data = result });
+        }
+
+        [HttpPost("UpdateGrade")]
+        public async Task<IActionResult> UpdateGrade([FromBody] GradeDto dto)
+        {
+            var result = await _gradeService.UpdateAsync(dto);
+            return Ok(new { message = "Grade updated", data = result });
+        }
+
+        [HttpPost("DeleteGrade")]
+        public async Task<IActionResult> DeleteGrade(int id)
+        {
+            var success = await _gradeService.DeleteAsync(id);
+            if (!success) return NotFound();
+
+            return Ok(new { message = "Deleted successfully" });
+        }
+
+        #endregion
+
         #region InterviewLevels
 
         [HttpGet("interview-levels")]
@@ -941,7 +989,12 @@ namespace HRMS_Backend.Controllers
             return Ok(new { message = "Leave Type deleted successfully" });
         }
 
-
+        [HttpGet("GetDesignationsbycompanycode")]
+        public async Task<IActionResult> GetDesignationsbycompanycode(int companyId, int regionId)
+        {
+            var data = await _leaveTypeService.GetDesignationsAsync(companyId, regionId);
+            return Ok(data);
+        }
 
         #endregion
         #region expenseCategory
