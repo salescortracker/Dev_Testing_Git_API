@@ -101,6 +101,7 @@ builder.Services.AddScoped<IEmploymentTypeService, EmploymentTypeService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 builder.Services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
+builder.Services.AddScoped<IVisaTypeService, VisaTypeService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
