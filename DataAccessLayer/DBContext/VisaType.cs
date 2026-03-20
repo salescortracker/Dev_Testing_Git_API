@@ -17,7 +17,7 @@ public partial class VisaType
 
     public bool IsActive { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool? IsDeleted { get; set; }
 
     public int? CreatedBy { get; set; }
 
@@ -26,4 +26,6 @@ public partial class VisaType
     public int? ModifiedBy { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
+
+    public int? UserId { get; set; }
 }

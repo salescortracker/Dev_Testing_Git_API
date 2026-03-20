@@ -783,12 +783,13 @@ public class UpdateResignationStatusRequest
             };
         }
 
-        [HttpGet("GetVisaTypes")]
-        public async Task<IActionResult> GetVisaTypes()
+        [HttpGet("GetVisaTypesByUser")]
+        public async Task<IActionResult> GetVisaTypesByUser(int companyId, int regionId)
         {
-            var list = await _employeeService.GetVisaTypesAsync();
-            var response = list.
-                Select(v => new
+            var list = await _employeeService.GetVisaTypesAsync(companyId, regionId);
+
+            var response = list
+                .Select(v => new
                 {
                     visaTypeId = v.VisaTypeId,
                     visaTypeName = v.VisaTypeName
