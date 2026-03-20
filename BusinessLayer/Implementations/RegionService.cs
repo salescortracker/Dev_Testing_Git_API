@@ -67,12 +67,24 @@ namespace BusinessLayer.Implementations
         {
             var entity = MapFromDynamic(model);
             entity.CreatedDate = DateTime.Now;
-            
+
+            var exists = (await _unitOfWork.Repository<Region>()
+                .GetAllAsync()) 
+            .Any(r => r.RegionName == entity.RegionName
+                   && r.CompanyId == entity.CompanyId
+                   && r.Country == entity.Country);
+
+            if (exists)
+            {
+                throw new InvalidOperationException("Region with the same name, company, and country already exists.");
+            }
+
             await _unitOfWork.Repository<Region>().AddAsync(entity);
             await _unitOfWork.CompleteAsync();
 
             return MapToDto(entity);
         }
+
 
         public async Task<RegionDto> UpdateRegionAsync(int id, object model)
         {
