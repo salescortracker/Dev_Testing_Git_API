@@ -4,11 +4,7 @@ using BusinessLayer.Interfaces;
 using DataAccessLayer.DBContext;
 using DataAccessLayer.Repositories.GeneralRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BusinessLayer.Implementations
 {
@@ -25,21 +21,19 @@ namespace BusinessLayer.Implementations
 
         #region Get All
         public async Task<ApiResponse<IEnumerable<AttendanceStatusDto>>>
-            GetAllAsync(int companyId, int regionId)
+            GetAllAsync(int userId)
         {
             try
             {
-                if (companyId <= 0 || regionId <= 0)
-                    return new ApiResponse<IEnumerable<AttendanceStatusDto>>(
-                        null, "Invalid company or region id", false);
+               
 
                 var data = await _unitOfWork
                     .Repository<AttendanceStatus>()
                     .GetAllAsync();
 
                 var result = data
-                    .Where(x => x.CompanyId == companyId &&
-                                x.RegionId == regionId &&
+                    .Where(x => 
+                                x.UserId == userId &&
                                 !x.IsDeleted)
                     .Select(MapToDto)
                     .ToList();
@@ -119,7 +113,9 @@ namespace BusinessLayer.Implementations
                     IsActive = dto.IsActive,
                     IsDeleted = false,
                     CreatedBy = dto.CreatedBy,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    UserId = dto.UserId
+
                 };
 
                 await _unitOfWork.Repository<AttendanceStatus>().AddAsync(entity);
@@ -239,7 +235,9 @@ namespace BusinessLayer.Implementations
                 CompanyId = entity.CompanyId,
                 RegionId = entity.RegionId,
                 Description = entity.Description,
-                IsActive = entity.IsActive
+                IsActive = entity.IsActive,
+                UserId = entity.UserId ?? 0
+
             };
         }
     }

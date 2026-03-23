@@ -93,6 +93,8 @@ namespace BusinessLayer.Implementations
         {
             var entity = await _unitOfWork.Repository<RoleMaster>().GetByIdAsync(id);
             if (entity == null) throw new Exception("Role not found");
+            entity.CompanyId = dto.CompanyId;
+            entity.RegionId = dto.RegionId;
 
             entity.RoleName = dto.RoleName;
             entity.RoleDescription = dto.RoleDescription;
