@@ -3,7 +3,7 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using DataAccessLayer.DBContext;
 using DataAccessLayer.Repositories.GeneralRepository;
-
+using Microsoft.EntityFrameworkCore;
 namespace BusinessLayer.Implementations
 {
     public class DesignationService:IDesignationService
@@ -55,36 +55,80 @@ namespace BusinessLayer.Implementations
             }
         }
 
+        //public async Task<ApiResponse<IEnumerable<DesignationDTO>>> GetAllAsync(int userId)
+        //{
+        //    try
+        //    {
+        //        var list = await _unitOfWork.Repository<Designation>()
+        //            .FindAsync(d => !d.IsDeleted && d.UserId == userId);
+
+        //        var dto = list.Select(d => new DesignationDTO
+        //        {
+        //            DesignationID = d.DesignationId,
+        //            CompanyID = d.CompanyId,
+        //            RegionID = d.RegionId,
+        //            DepartmentID = d.DepartmentId,
+        //            DesignationName = d.DesignationName,
+        //            IsActive = d.IsActive,
+        //            companyName = d.CompanyId != null ? _hrmsContext.Companies
+        //                            .Where(x => x.CompanyId == d.CompanyId).FirstOrDefault().CompanyName:null
+        //                            ,
+        //            regionName = _hrmsContext.Regions
+        //                            .Where(x => x.RegionId == d.RegionId)
+        //                            .Select(x => x.RegionName)
+        //                            .FirstOrDefault(),
+        //            departmentName = _hrmsContext.Departments
+        //                            .Where(x => x.DepartmentId == d.DepartmentId)
+        //                            .Select(x => x.DepartmentName)
+        //                            .FirstOrDefault(),
+        //            GradeName = _hrmsContext.Grades.Where(x => x.GradeId == d.GradeId).Select(x => x.GradeName).FirstOrDefault(),
+        //        });
+
+        //        return new ApiResponse<IEnumerable<DesignationDTO>>(dto, "Success");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ApiResponse<IEnumerable<DesignationDTO>>(null!, ex.Message, false);
+        //    }
+        //}
+
         public async Task<ApiResponse<IEnumerable<DesignationDTO>>> GetAllAsync(int userId)
         {
             try
             {
-                var list = await _unitOfWork.Repository<Designation>()
-                    .FindAsync(d => !d.IsDeleted && d.UserId == userId);
+                var result = await (
+                    from d in _hrmsContext.Designations     
+                    join c in _hrmsContext.Companies on d.CompanyId equals c.CompanyId into cj
+                    from c in cj.DefaultIfEmpty()
+                    join r in _hrmsContext.Regions on d.RegionId equals r.RegionId into rj
+                    from r in rj.DefaultIfEmpty()
+                    join dept in _hrmsContext.Departments on d.DepartmentId equals dept.DepartmentId into dj
+                    from dept in dj.DefaultIfEmpty()
 
-                var dto = list.Select(d => new DesignationDTO
-                {
-                    DesignationID = d.DesignationId,
-                    CompanyID = d.CompanyId,
-                    RegionID = d.RegionId,
-                    DepartmentID = d.DepartmentId,
-                    DesignationName = d.DesignationName,
-                    IsActive = d.IsActive,
-                    companyName = _hrmsContext.Companies
-                                    .Where(x => x.CompanyId == d.CompanyId)
-                                    .Select(x => x.CompanyName)
-                                    .FirstOrDefault(),
-                    regionName = _hrmsContext.Regions
-                                    .Where(x => x.RegionId == d.RegionId)
-                                    .Select(x => x.RegionName)
-                                    .FirstOrDefault(),
-                    departmentName = _hrmsContext.Departments
-                                    .Where(x => x.DepartmentId == d.DepartmentId)
-                                    .Select(x => x.DepartmentName)
-                                    .FirstOrDefault()
-                });
+                    join g in _hrmsContext.Grades on d.GradeId equals g.GradeId into gj
+                    from g in gj.DefaultIfEmpty()
 
-                return new ApiResponse<IEnumerable<DesignationDTO>>(dto, "Success");
+                    where !d.IsDeleted && d.UserId == userId
+
+                    select new DesignationDTO
+                    {
+                        DesignationID = d.DesignationId,
+                        CompanyID = d.CompanyId,
+                        RegionID = d.RegionId,
+                        DepartmentID = d.DepartmentId,
+                        GradeID = d.GradeId,
+                        GradeName = g.GradeName,
+
+                        DesignationName = d.DesignationName,
+                        IsActive = d.IsActive,
+
+                        companyName = c.CompanyName,
+                        regionName = r.RegionName,
+                        departmentName = dept.DepartmentName
+                    }
+                ).ToListAsync();
+
+                return new ApiResponse<IEnumerable<DesignationDTO>>(result, "Success");
             }
             catch (Exception ex)
             {
@@ -124,7 +168,7 @@ namespace BusinessLayer.Implementations
                 var exists = (await _unitOfWork.Repository<Designation>().FindAsync(d =>
                     !d.IsDeleted &&
                     d.CompanyId == dto.CompanyID &&
-                    d.RegionId == dto.RegionID &&
+                    d.RegionId == dto.RegionID && d.GradeId == dto.GradeID &&
                     d.DesignationName.ToLower() == dto.DesignationName.ToLower()))
                     .Any();
 
@@ -140,7 +184,8 @@ namespace BusinessLayer.Implementations
                     IsActive = dto.IsActive,
                     CreatedBy = dto.createdBy,
                     CreatedAt = DateTime.UtcNow,
-                    UserId = dto.userId
+                    UserId = dto.userId,
+                    GradeId = dto.GradeID
                 };
 
                 await _unitOfWork.Repository<Designation>().AddAsync(entity);
@@ -176,7 +221,7 @@ namespace BusinessLayer.Implementations
                     !d.IsDeleted &&
                     d.DesignationId != id &&
                     d.CompanyId == dto.CompanyID &&
-                    d.RegionId == dto.RegionID &&
+                    d.RegionId == dto.RegionID && d.GradeId == dto.GradeID &&
                     d.DesignationName.ToLower() == dto.DesignationName.ToLower())).Any();
 
                 if (dup)
@@ -189,6 +234,7 @@ namespace BusinessLayer.Implementations
                 entity.IsActive = dto.IsActive;
                 entity.ModifiedBy = dto.modifiedBy;
                 entity.ModifiedAt = DateTime.UtcNow;
+                entity.GradeId = dto.GradeID;
 
                 _unitOfWork.Repository<Designation>().Update(entity);
                 await _unitOfWork.CompleteAsync();
