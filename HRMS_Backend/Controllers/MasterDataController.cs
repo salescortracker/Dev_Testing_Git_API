@@ -37,7 +37,8 @@ namespace HRMS_Backend.Controllers
         private readonly IInterviewLevelService _interviewLevelService;
         private readonly ICompanyNewsCategoryService _companyNewsCategoryService;
         private readonly IEmploymentTypeService _employmentTypeService;
-        public MasterDataController(IEmploymentTypeService employmentTypeService,ICompanyNewsCategoryService companyNewsCategoryService,IRecruitmentNoticePeriodService recruitmentNoticePeriodService, IScreeningResultService screeningResultService, IInterviewLevelService interviewLevelService,ICompanyNewsPolicyService companyNewsPolicyService,IModeOfStudyService modeOfStudyService,IEventService Eventservice,IResignationService resignationService,IPolicyCategoryService policyCategoryService,ILeaveStatusService leaveStatusService,IHolidayListService holidayListService, IWeekoffService weekoffService,IAttendanceStatusService attendanceStatusService, IExpenseCategoryService expenseCategoryservice,IDepartmentService service, IDesignationService designationService, IGenderService genderService,IadminService adminService, ILeaveTypeService leaveTypeService,  ILogger<MasterDataController> logger, IKpiCategoryService kpiCategoryService, IEmployeeMasterService employeeService, ICertificationTypeService certificationTypeService, IAssetStatusService assetStatusService, IBloodGroupService bloodGroupService, IHelpdeskCategoryAdminService helpdeskCategoryAdminService, IProjectStatusAdminService projectStatusAdminService, IPriorityService priorityService)
+        private readonly IVisaTypeService _visaTypeService;
+        public MasterDataController(IEmploymentTypeService employmentTypeService,ICompanyNewsCategoryService companyNewsCategoryService,IRecruitmentNoticePeriodService recruitmentNoticePeriodService, IScreeningResultService screeningResultService, IInterviewLevelService interviewLevelService,ICompanyNewsPolicyService companyNewsPolicyService,IModeOfStudyService modeOfStudyService,IEventService Eventservice,IResignationService resignationService,IPolicyCategoryService policyCategoryService,ILeaveStatusService leaveStatusService,IHolidayListService holidayListService, IWeekoffService weekoffService,IAttendanceStatusService attendanceStatusService, IExpenseCategoryService expenseCategoryservice,IDepartmentService service, IDesignationService designationService, IGenderService genderService,IadminService adminService, ILeaveTypeService leaveTypeService,  ILogger<MasterDataController> logger, IKpiCategoryService kpiCategoryService, IEmployeeMasterService employeeService, ICertificationTypeService certificationTypeService, IAssetStatusService assetStatusService, IBloodGroupService bloodGroupService, IHelpdeskCategoryAdminService helpdeskCategoryAdminService, IProjectStatusAdminService projectStatusAdminService, IPriorityService priorityService, IVisaTypeService visaTypeService)
         {
             _service = service;
             _Eventservice = Eventservice;
@@ -68,6 +69,7 @@ namespace HRMS_Backend.Controllers
             _interviewLevelService = interviewLevelService;
             _companyNewsCategoryService = companyNewsCategoryService;
             _employmentTypeService = employmentTypeService;
+            _visaTypeService = visaTypeService;
         }
         #region InterviewLevels
 
@@ -1762,5 +1764,30 @@ int regionId)
         }
 
         #endregion
+
+        [HttpGet("visa-type-list")]
+        public async Task<IActionResult> GetVisaTypeList(int userId)
+        {
+            var data = await _visaTypeService.GetVisaTypeList(userId);
+            return Ok(new { data });
+        }
+        [HttpPost("CreateVisaType")]
+        public async Task<IActionResult> CreateVisaType([FromBody] VisaTypeDto dto)
+        {
+            var result = await _visaTypeService.CreateVisaType(dto);
+            return Ok(new { message = result });
+        }
+        [HttpPost("UpdateVisaType")]
+        public async Task<IActionResult> UpdateVisaType([FromBody] VisaTypeDto dto)
+        {
+            var result = await _visaTypeService.UpdateVisaType(dto);
+            return Ok(new { message = result });
+        }
+        [HttpPost("DeleteVisaType")]
+        public async Task<IActionResult> DeleteVisaType(int id)
+        {
+            var result = await _visaTypeService.DeleteVisaType(id);
+            return Ok(new { message = result });
+        }
     }
 }
