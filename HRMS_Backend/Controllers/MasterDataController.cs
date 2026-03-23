@@ -806,66 +806,33 @@ namespace HRMS_Backend.Controllers
             return deleted ? Ok() : NotFound();
         }
 
-        #region ===================== CERTIFICATION TYPES =====================
+        #region CertificationType
 
-        [HttpGet("certification-types")]
-        public async Task<IActionResult> GetCertificationTypes(
-            int companyId,
-            int regionId)
+        [HttpGet("certification-type-list")]
+        public async Task<IActionResult> GetCertificationTypes([FromQuery] int userId)
         {
-            var result = await _certificationTypeService
-                .GetAllAsync(companyId, regionId);
-
-            return Ok(result!=null?result.Data:result);
+            var result = await _certificationTypeService.GetAll(userId);
+            return Ok(result);
         }
 
-        [HttpGet("GetCmpregionAllAsync")]
-        public async Task<IActionResult> GetCmpregionAllAsync(
-           int companyId,
-           int regionId)
-        {
-            var result = await _certificationTypeService
-                .GetCmpregionAllAsync(companyId, regionId);
-
-            return Ok(result != null ? result.Data : result);
-        }
-
-        [HttpGet("certification-types/{id:int}")]
+        [HttpGet("certification-type/{id:int}")]
         public async Task<IActionResult> GetCertificationTypeById(int id)
         {
             var result = await _certificationTypeService.GetByIdAsync(id);
-
-            if (!result.Success)
-                return NotFound(result);
-
             return Ok(result);
         }
 
         [HttpPost("CreateCertificationType")]
-        public async Task<IActionResult> CreateCertificationType(
-            [FromBody] CreateUpdateCertificationTypeDto dto
-            )
+        public async Task<IActionResult> CreateCertificationType([FromBody] CreateUpdateCertificationTypeDto dto)
         {
             var result = await _certificationTypeService.CreateAsync(dto);
-
-            if (!result.Success)
-                return BadRequest(result);
-
             return Ok(result);
         }
 
         [HttpPost("UpdateCertificationType")]
-        public async Task<IActionResult> UpdateCertificationType(
-           
-            [FromBody] CreateUpdateCertificationTypeDto dto
-            )
+        public async Task<IActionResult> UpdateCertificationType([FromBody] CreateUpdateCertificationTypeDto dto)
         {
-            var result = await _certificationTypeService
-                .UpdateAsync( dto);
-
-            if (!result.Success)
-                return BadRequest(result);
-
+            var result = await _certificationTypeService.UpdateAsync(dto);
             return Ok(result);
         }
 
@@ -873,25 +840,20 @@ namespace HRMS_Backend.Controllers
         public async Task<IActionResult> DeleteCertificationType([FromQuery] int id)
         {
             var result = await _certificationTypeService.DeleteAsync(id);
-
-            if (!result.Success)
-                return NotFound(result);
-
             return Ok(result);
         }
-
-        [HttpPost("certification-types/bulk")]
-        public async Task<IActionResult> BulkInsertCertificationTypes(
-            [FromBody] IEnumerable<CreateUpdateCertificationTypeDto> dtos,
-            [FromQuery] int createdBy)
+        [HttpGet("GetCmpregionAllAsync")]
+        public async Task<IActionResult> GetCmpregionAllAsync(
+    [FromQuery] int companyId,
+    [FromQuery] int regionId)
         {
-            var result = await _certificationTypeService
-                .BulkInsertAsync(dtos, createdBy);
-
+            var result = await _certificationTypeService.GetCmpregionAllAsync(companyId, regionId);
             return Ok(result);
         }
+
 
         #endregion
+
         #region LeaveType
         [HttpGet("GetLeaveType")]
         public async Task<IActionResult> GetLeaveType()
@@ -1007,7 +969,7 @@ namespace HRMS_Backend.Controllers
         // ===============================
         // UPDATE
         // ===============================
-        [HttpPut("project-status/{id}")]
+        [HttpPost("project-status/{id}")]
         public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectStatusDto dto)
         {
             dto.ProjectStatusId = id;
@@ -1018,7 +980,7 @@ namespace HRMS_Backend.Controllers
         // ===============================
         // DELETE
         // ===============================
-        [HttpDelete("project-status/{id}")]
+        [HttpPost("project-status/{id}")]
         public async Task<IActionResult> DeleteProject(int id)
         {
             var result = await _projectStatusAdminService.DeleteProjectAsync(id);
@@ -1122,9 +1084,9 @@ namespace HRMS_Backend.Controllers
         #region AttendanceStatus
 
         [HttpGet("GetAllAttendanceStatus")]
-        public async Task<IActionResult> GetAll(int companyId, int regionId)
+        public async Task<IActionResult> GetAllAttendanceStatus(int userId)
         {
-            var result = await _attendanceStatusService.GetAllAsync(companyId, regionId);
+            var result = await _attendanceStatusService.GetAllAsync(userId);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -1158,8 +1120,8 @@ namespace HRMS_Backend.Controllers
                 result);
         }
 
-        [HttpPut("UpdateAttendanceStatus")]
-        public async Task<IActionResult> UpdateAttendanceStatus(int id, [FromBody] AttendanceStatusDto dto)
+        [HttpPost("UpdateAttendanceStatus")]
+        public async Task<IActionResult> UpdateAttendanceStatus([FromBody] AttendanceStatusDto dto)
         {
 
             var result = await _attendanceStatusService.UpdateAsync(dto);
@@ -1170,7 +1132,7 @@ namespace HRMS_Backend.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("DeleteAttendanceStatus/{id}")]
+        [HttpPost("DeleteAttendanceStatus/{id}")]
         public async Task<IActionResult> DeleteAttendanceStatus(int id)
         {
             return Ok(await _attendanceStatusService.DeleteAsync(id));
