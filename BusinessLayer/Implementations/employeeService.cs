@@ -741,15 +741,14 @@ namespace BusinessLayer.Implementations
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<VisaTypeDto>> GetVisaTypesAsync()
+        public async Task<List<VisaTypeDto>> GetVisaTypesAsync(int companyId, int regionId)
         {
-            return await _context.VisaTypeMasters
+            return await _context.VisaTypes
+                .Where(v => v.CompanyId == companyId && v.RegionId == regionId && v.IsActive && (v.IsDeleted == false || v.IsDeleted == null))
                 .Select(v => new VisaTypeDto
                 {
                     VisaTypeId = v.VisaTypeId,
-                    CompanyId = v.CompanyId,
-                    RegionId = v.RegionId,
-                    VisaTypeName = v.VisaTypeName
+                    VisaTypeName = v.VisaType1
                 })
                 .ToListAsync();
         }

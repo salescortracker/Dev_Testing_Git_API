@@ -76,6 +76,9 @@ namespace BusinessLayer.Implementations
                 Headquarters = dto.headquarters,
                 IsActive = dto.isActive,
                 UserId = dto.userId,
+                CompanyContact = dto.CompanyContact,
+                CompanyAddress = dto.CompanyAddress,
+                CompanyEmail = dto.CompanyEmail,
                 CreatedDate = DateTime.UtcNow
             };
 
@@ -117,6 +120,9 @@ namespace BusinessLayer.Implementations
             entity.Headquarters = dto.headquarters;
             entity.IsActive = dto.isActive;
             entity.UserId = dto.userId;
+            entity.CompanyContact = dto.CompanyContact;
+            entity.CompanyAddress = dto.CompanyAddress;
+            entity.CompanyEmail = dto.CompanyEmail;
             entity.ModifiedAt = DateTime.UtcNow;
 
             _unitOfWork.Repository<Company>().Update(entity);
@@ -154,7 +160,10 @@ namespace BusinessLayer.Implementations
                 industryType = c.IndustryType,
                 headquarters = c.Headquarters,
                 isActive = c.IsActive,
-                userId = c.UserId
+                userId = c.UserId,
+                CompanyContact = c.CompanyContact,
+                CompanyAddress = c.CompanyAddress,
+                CompanyEmail = c.CompanyEmail
             };
         }
     }

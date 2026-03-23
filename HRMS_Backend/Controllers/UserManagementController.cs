@@ -256,8 +256,19 @@ namespace HRMS_Backend.Controllers
         [Route("SaveRegion")]
         public async Task<IActionResult> SaveRegion([FromBody] object model)
         {
-            var region = await _regionService.AddRegionAsync(model);
-            return CreatedAtAction(nameof(GetRegionById), new { id = region.RegionID }, region);
+            try
+            {
+                var region = await _regionService.AddRegionAsync(model);
+                return CreatedAtAction(nameof(GetRegionById), new { id = region.RegionID }, region);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error." });
+            }
         }
         /// <summary>
         /// 

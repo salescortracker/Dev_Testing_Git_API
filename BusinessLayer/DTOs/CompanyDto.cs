@@ -15,6 +15,9 @@ namespace BusinessLayer.DTOs
         public string? headquarters { get; set; }       
         public bool? isActive { get; set; }
         public int? userId { get; set; }
+        public string? CompanyContact { get; set; }
+        public string? CompanyAddress { get; set; }
+        public string? CompanyEmail { get; set; }
     }
    
 }
